@@ -42,6 +42,7 @@ def openvim_available(openvim):
         for endpoint in service['hosts']:
             host = endpoint['hostname']
             port = endpoint['port']
+            user = endpoint['user']
 
             openvim_uri = '{}:{}'.format(host, port)
             if kvdb.get('openvim_uri') == openvim_uri:
@@ -49,8 +50,8 @@ def openvim_available(openvim):
 
             # TODO do something with the openvim endpoint info
             # openmano datacenter-create url:port
-            out, err = _run('./scripts/create-datacenter.sh {} {}'.format(
-                host, port))
+            out, err = _run('./scripts/create-datacenter.sh {} {} {}'.format(
+                host, port, user))
 
             kvdb.set('openvim_uri', openvim_uri)
             status_set('waiting', 'Waiting for database')

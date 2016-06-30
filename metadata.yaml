@@ -10,7 +10,7 @@ requires:
   db:
     interface: mysql
   openvim-controller:
-    interface: http
+    interface: openvim
 #  openstack:
 #    interface: keystone
 provides:
