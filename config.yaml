@@ -1,0 +1,14 @@
+options:
+  openmano-repo:
+    type: string
+    default: "https://osm.etsi.org/gerrit/osm/openmano.git"
+    description: "The Git repository to install OpenMano from."
+  # boolean-option:
+  #   type: boolean
+  #   default: False
+  #   description: "A short description of the configuration option"
+  # int-option:
+  #   type: int
+  #   default: 9001
+  #   description: "A short description of the configuration option"
+  #
