@@ -1,5 +1,5 @@
 options:
-  openmano-repo:
+  source:
     type: string
     default: "https://osm.etsi.org/gerrit/osm/openmano.git"
     description: "The Git repository to install OpenMano from."
