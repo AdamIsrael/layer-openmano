@@ -29,7 +29,38 @@ USER = 'openmanod'
 
 
 @when('openmano.installed')
+@when('openmano.available')
+def openmano_available(openmano):
+    # TODO make this configurable via charm config
+    openmano.configure(port=9090)
+
+
+@when('openmano.installed')
+@when('openvim-controller.available')
+def openvim_available(openvim):
+    for service in openvim.services():
+        for endpoint in service['hosts']:
+            host = endpoint['hostname']
+            port = endpoint['port']
+
+            openvim_uri = '{}:{}'.format(host, port)
+            if kvdb.get('openvim_uri') == openvim_uri:
+                return
+
+            # TODO do something with the openvim endpoint info
+            # openmano datacenter-create url:port
+            out, err = _run('./scripts/create-datacenter.sh {} {}'.format(
+                host, port))
+
+            kvdb.set('openvim_uri', openvim_uri)
+            status_set('waiting', 'Waiting for database')
+            break
+        break
+
+
+@when('openmano.installed')
 @when('db.available')
+@when('openvim-controller.available')
 @when_not('openmano.running')
 def start(*args):
     cmd = "/home/{}/bin/service-openmano start".format(USER)
@@ -48,6 +79,18 @@ def setup_db(db):
     """Setup the database
 
     """
+    db_uri = 'mysql://{}:{}@{}:{}/{}'.format(
+        db.user(),
+        db.password(),
+        db.host(),
+        db.port(),
+        db.database(),
+    )
+
+    if kvdb.get('db_uri') == db_uri:
+        # We're already configured
+        return
+
     status_set('maintenance', 'Initializing database')
 
     cmd = "{}/database_utils/init_mano_db.sh ".format(kvdb.get('repo'))
@@ -74,6 +117,8 @@ def setup_db(db):
         owner=USER,
         group=USER,
     )
+    kvdb.set('db_uri', db_uri)
+    status_set('waiting', 'Waiting for vim')
 
 
 @when_not('openmano.installed')
@@ -83,7 +128,8 @@ def install_layer_openmano():
     cfg = config()
 
     # TODO change user home
-    host.adduser(USER, password='')
+    # XXX security issue!
+    host.adduser(USER, password=USER)
 
     # TODO check out a branch
     dest_dir = install_remote(
@@ -107,9 +153,11 @@ def install_layer_openmano():
         "{}/scripts/service-openmano.sh".format(dest_dir),
         "/home/{}/bin/service-openmano".format(USER))
 
+    out, err = _run('./scripts/create-tenant.sh')
+
     open_port(9090)
     set_state('openmano.installed')
-    status_set('waiting', 'Waiting for database')
+    status_set('waiting', 'Waiting for database and vim')
 
 
 def _run(cmd, env=None):

@@ -9,10 +9,10 @@ subordinate: false
 requires:
   db:
     interface: mysql
-  openvim:
-    interface: openvim
-  openstack:
-    interface: keystone
+  openvim-controller:
+    interface: http
+#  openstack:
+#    interface: keystone
 provides:
   openmano:
-    interface: openmano
+    interface: http
