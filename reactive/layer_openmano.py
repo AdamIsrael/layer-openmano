@@ -50,8 +50,9 @@ def openvim_available(openvim):
 
             # TODO do something with the openvim endpoint info
             # openmano datacenter-create url:port
-            out, err = _run('./scripts/create-datacenter.sh {} {} {}'.format(
-                host, port, user))
+            out, err = _run(
+                './scripts/create-datacenter.sh {} {} {} {}'.format(
+                    host, port, user, kvdb.get('openmano-tenant')))
 
             kvdb.set('openvim_uri', openvim_uri)
             status_set('waiting', 'Waiting for database')
@@ -155,6 +156,7 @@ def install_layer_openmano():
         "/home/{}/bin/service-openmano".format(USER))
 
     out, err = _run('./scripts/create-tenant.sh')
+    kvdb.set('openmano-tenant', out.strip())
 
     open_port(9090)
     set_state('openmano.installed')
