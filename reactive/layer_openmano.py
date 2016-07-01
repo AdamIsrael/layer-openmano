@@ -39,7 +39,7 @@ def openmano_available(openmano):
 @when('openmano.installed')
 @when('db.available')
 @when('openvim-controller.available')
-def openvim_available(openvim):
+def openvim_available(openvim, db):
     for service in openvim.services():
         for endpoint in service['hosts']:
             host = endpoint['hostname']
