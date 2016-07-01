@@ -72,6 +72,10 @@ def start(*args):
         'Up on {host}:{port}'.format(
             host=hookenv.unit_public_ip(),
             port='9090'))
+    if not kvdb.get('openmano-tenant'):
+        out, err = _run('./scripts/create-tenant.sh')
+        kvdb.set('openmano-tenant', out.strip())
+
     set_state('openmano.running')
 
 
@@ -154,9 +158,6 @@ def install_layer_openmano():
     os.symlink(
         "{}/scripts/service-openmano.sh".format(dest_dir),
         "/home/{}/bin/service-openmano".format(USER))
-
-    out, err = _run('./scripts/create-tenant.sh')
-    kvdb.set('openmano-tenant', out.strip())
 
     open_port(9090)
     set_state('openmano.installed')
