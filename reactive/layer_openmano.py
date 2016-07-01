@@ -37,6 +37,7 @@ def openmano_available(openmano):
 
 
 @when('openmano.installed')
+@when('db.available')
 @when('openvim-controller.available')
 def openvim_available(openvim):
     for service in openvim.services():
@@ -161,6 +162,7 @@ def install_layer_openmano():
         depth='1',
         branch='master',
     )
+    os.mkdir(os.path.join(dest_dir, 'logs'))
     host.chownr(dest_dir, USER, USER)
     kvdb.set('repo', dest_dir)
 
