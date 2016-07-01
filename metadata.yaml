@@ -1,10 +1,15 @@
 name: openmano
-summary: OpenMano
-maintainer: Adam Israel <adam@adamisrael.com>
+summary: OpenMANO
+maintainers:
+  - Adam Israel <adam@adamisrael.com>
 description: |
-  <Multi-line description here>
+  Installs and configures OpenMANO
 tags:
-  - misc
+  - nfv
+  - telco
+  - osm
+series:
+  - xenial
 subordinate: false
 requires:
   db:
