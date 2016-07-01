@@ -20,6 +20,7 @@ from charms.reactive import (
     when,
     when_not,
     set_state,
+    is_state,
 )
 
 kvdb = kv()
@@ -48,14 +49,13 @@ def openvim_available(openvim):
             if kvdb.get('openvim_uri') == openvim_uri:
                 return
 
-            # TODO do something with the openvim endpoint info
-            # openmano datacenter-create url:port
             out, err = _run(
                 './scripts/create-datacenter.sh {} {} {} {}'.format(
                     host, port, user, kvdb.get('openmano-tenant')))
 
             kvdb.set('openvim_uri', openvim_uri)
-            status_set('waiting', 'Waiting for database')
+            if not is_state('db.available'):
+                status_set('waiting', 'Waiting for database')
             break
         break
 
@@ -67,14 +67,16 @@ def openvim_available(openvim):
 def start(*args):
     cmd = "/home/{}/bin/service-openmano start".format(USER)
     out, err = _run(cmd)
+
+    if not kvdb.get('openmano-tenant'):
+        out, err = _run('./scripts/create-tenant.sh')
+        kvdb.set('openmano-tenant', out.strip())
+
     status_set(
         'active',
         'Up on {host}:{port}'.format(
             host=hookenv.unit_public_ip(),
             port='9090'))
-    if not kvdb.get('openmano-tenant'):
-        out, err = _run('./scripts/create-tenant.sh')
-        kvdb.set('openmano-tenant', out.strip())
 
     set_state('openmano.running')
 
@@ -124,7 +126,22 @@ def setup_db(db):
         group=USER,
     )
     kvdb.set('db_uri', db_uri)
+
+
+@when_not('openvim-controller.available')
+def need_openvim():
     status_set('waiting', 'Waiting for vim')
+
+
+@when_not('db.available')
+def need_db():
+    status_set('waiting', 'Waiting for database')
+
+
+@when_not('db.available')
+@when_not('openvim-controller.available')
+def need_everything():
+    status_set('waiting', 'Waiting for database and vim')
 
 
 @when_not('openmano.installed')
@@ -161,7 +178,6 @@ def install_layer_openmano():
 
     open_port(9090)
     set_state('openmano.installed')
-    status_set('waiting', 'Waiting for database and vim')
 
 
 def _run(cmd, env=None):
