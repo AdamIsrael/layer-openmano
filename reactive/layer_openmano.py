@@ -130,7 +130,7 @@ def setup_db(db):
 
 @when_not('openvim-controller.available')
 def need_openvim():
-    status_set('waiting', 'Waiting for vim')
+    status_set('waiting', 'Waiting for OpenVIM')
 
 
 @when_not('db.available')
@@ -141,7 +141,7 @@ def need_db():
 @when_not('db.available')
 @when_not('openvim-controller.available')
 def need_everything():
-    status_set('waiting', 'Waiting for database and vim')
+    status_set('waiting', 'Waiting for database and OpenVIM')
 
 
 @when_not('openmano.installed')
