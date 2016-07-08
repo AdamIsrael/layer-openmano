@@ -1,13 +1,23 @@
 name: openmano
-summary: OpenMano
-maintainer: Adam Israel <adam@adamisrael.com>
+summary: OpenMANO
+maintainers:
+  - Adam Israel <adam@adamisrael.com>
 description: |
-  <Multi-line description here>
+  Installs and configures OpenMANO
 tags:
-  # Replace "misc" with one or more whitelisted tags from this list:
-  # https://jujucharms.com/docs/stable/authors-charm-metadata
-  - misc
+  - nfv
+  - telco
+  - osm
+series:
+  - xenial
 subordinate: false
 requires:
   db:
     interface: mysql
+  openvim-controller:
+    interface: openvim
+#  openstack:
+#    interface: keystone
+provides:
+  openmano:
+    interface: http

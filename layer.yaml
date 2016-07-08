@@ -1,4 +1,9 @@
-includes: ['layer:basic', 'interface:mysql']  # if you use any interfaces, add them here
+includes:
+  - 'layer:basic'
+  - 'interface:mysql'
+  - 'interface:openvim'
+  - 'interface:http'
+
 options:
   basic:
     packages:
@@ -17,4 +22,4 @@ options:
         - python-neutronclient
 
         # mysql client needed to install database
-        - mariadb-client-core-5.5
+        - mariadb-client
