@@ -164,10 +164,10 @@ def install_layer_openmano():
 
     # TODO check out a branch
     dest_dir = install_remote(
-        cfg['source'],
+        cfg['repository'],
         dest=INSTALL_PATH,
         depth='1',
-        branch='master',
+        branch=cfg['branch'],
     )
     os.mkdir(os.path.join(dest_dir, 'logs'))
     host.chownr(dest_dir, USER, USER)

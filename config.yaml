@@ -1,5 +1,9 @@
 options:
-  source:
+  repository:
     type: string
     default: "https://osm.etsi.org/gerrit/osm/openmano.git"
     description: "The Git repository to install OpenMano from."
+  branch:
+    type: string
+    default: "master"
+    description: "The Git branch to install."
