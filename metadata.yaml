@@ -16,8 +16,6 @@ requires:
     interface: mysql
   openvim-controller:
     interface: openvim
-#  openstack:
-#    interface: keystone
 provides:
   openmano:
     interface: http
