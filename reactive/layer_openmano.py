@@ -39,6 +39,7 @@ def openmano_available(openmano):
 @when('openmano.installed')
 @when('db.available')
 @when('openvim-controller.available')
+@when('openmano.running')
 def openvim_available(openvim, db):
     for service in openvim.services():
         for endpoint in service['hosts']:
@@ -50,9 +51,15 @@ def openvim_available(openvim, db):
             if kvdb.get('openvim_uri') == openvim_uri:
                 return
 
-            out, err = _run(
-                './scripts/create-datacenter.sh {} {} {} {}'.format(
-                    host, port, user, kvdb.get('openmano-tenant')))
+            # TODO: encapsulate the logic in create-datacenter.sh into python
+            try:
+                out, err = _run(
+                    './scripts/create-datacenter.sh {} {} {} {}'.format(
+                        host, port, user, kvdb.get('openmano-tenant')))
+            except subprocess.CalledProcessError as e:
+                # Ignore the error if the datacenter already exists.
+                if e.returncode != 153:
+                    raise
 
             kvdb.set('openvim_uri', openvim_uri)
             if not is_state('db.available'):
