@@ -1,3 +1,6 @@
+from git import Repo as gitrepo
+from shutil import rmtree
+
 import os
 import subprocess
 
@@ -10,10 +13,6 @@ from charmhelpers.core.hookenv import (
     log,
     open_port,
     status_set,
-)
-
-from charmhelpers.fetch import (
-    install_remote,
 )
 
 from charms.reactive import (
@@ -162,27 +161,37 @@ def install_layer_openmano():
     # XXX security issue!
     host.adduser(USER, password=USER)
 
-    # TODO check out a branch
-    dest_dir = install_remote(
+    if os.path.isdir(INSTALL_PATH):
+        rmtree(INSTALL_PATH)
+
+    gitrepo.clone_from(
         cfg['repository'],
-        dest=INSTALL_PATH,
-        depth='1',
+        INSTALL_PATH,
         branch=cfg['branch'],
     )
-    os.mkdir(os.path.join(dest_dir, 'logs'))
-    host.chownr(dest_dir, USER, USER)
-    kvdb.set('repo', dest_dir)
+
+    host.chownr(
+        INSTALL_PATH,
+        owner=USER,
+        group=USER,
+        follow_links=False,
+        chowntopdir=True
+    )
+
+    os.mkdir(os.path.join(INSTALL_PATH, 'logs'))
+    host.chownr(INSTALL_PATH, USER, USER)
+    kvdb.set('repo', INSTALL_PATH)
 
     os.mkdir('/home/{}/bin'.format(USER))
 
     os.symlink(
-        "{}/openmano".format(dest_dir),
+        "{}/openmano".format(INSTALL_PATH),
         "/home/{}/bin/openmano".format(USER))
     os.symlink(
-        "{}/scripts/openmano-report.sh".format(dest_dir),
+        "{}/scripts/openmano-report.sh".format(INSTALL_PATH),
         "/home/{}/bin/openmano-report.sh".format(USER))
     os.symlink(
-        "{}/scripts/service-openmano.sh".format(dest_dir),
+        "{}/scripts/service-openmano.sh".format(INSTALL_PATH),
         "/home/{}/bin/service-openmano".format(USER))
 
     open_port(9090)

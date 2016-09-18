@@ -14,12 +14,13 @@ options:
         - python-paramiko
         - python-argcomplete
         - python-requests
+        - python3-git
 
         # These are for openstack as a VIM
-        - python-novaclient
-        - python-keystoneclient
-        - python-glanceclient
-        - python-neutronclient
+        # - python-novaclient
+        # - python-keystoneclient
+        # - python-glanceclient
+        # - python-neutronclient
 
         # mysql client needed to install database
         - mariadb-client
