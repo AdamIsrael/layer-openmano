@@ -15,6 +15,10 @@ from charmhelpers.core.hookenv import (
     status_set,
 )
 
+from charmhelpers.core.host import (
+    chownr,
+)
+
 from charms.reactive import (
     when,
     when_not,
@@ -170,7 +174,7 @@ def install_layer_openmano():
         branch=cfg['branch'],
     )
 
-    host.chownr(
+    chownr(
         INSTALL_PATH,
         owner=USER,
         group=USER,
@@ -179,7 +183,7 @@ def install_layer_openmano():
     )
 
     os.mkdir(os.path.join(INSTALL_PATH, 'logs'))
-    host.chownr(INSTALL_PATH, USER, USER)
+    chownr(INSTALL_PATH, USER, USER)
     kvdb.set('repo', INSTALL_PATH)
 
     os.mkdir('/home/{}/bin'.format(USER))
