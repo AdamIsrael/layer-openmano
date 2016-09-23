@@ -76,6 +76,8 @@ def openvim_available(openvim, db):
 @when('openvim-controller.available')
 @when_not('openmano.running')
 def start(*args):
+    # TODO: if the service fails to start, we should raise an error to the op
+    # Right now, it sets the state as running and the charm dies.
     cmd = "/home/{}/bin/service-openmano start".format(USER)
     out, err = _run(cmd)
 
@@ -94,6 +96,7 @@ def start(*args):
 
 @when('openmano.installed')
 @when('db.available')
+@when_not('db.installed')
 def setup_db(db):
     """Setup the database
 
@@ -112,15 +115,19 @@ def setup_db(db):
 
     status_set('maintenance', 'Initializing database')
 
-    cmd = "{}/database_utils/init_mano_db.sh ".format(kvdb.get('repo'))
-    cmd += "-u {} -p{} -h {} -d {} -P {}".format(
-        db.user(),
-        db.password(),
-        db.host(),
-        db.database(),
-        db.port(),
-    )
-    output, err = _run(cmd)
+    try:
+        cmd = "{}/database_utils/init_mano_db.sh --createdb".format(kvdb.get('repo'))
+        cmd += "-u {} -p{} -h {} -d {} -P {}".format(
+            db.user(),
+            db.password(),
+            db.host(),
+            db.database(),
+            db.port(),
+        )
+        output, err = _run(cmd)
+    except subprocess.CalledProcessError:
+        # Eat this. init_mano_db.sh will return error code 1 on success
+        pass
 
     context = {
         'user': db.user(),
@@ -138,6 +145,8 @@ def setup_db(db):
     )
     kvdb.set('db_uri', db_uri)
 
+    status_set('active', 'Database installed.')
+    set_state('db.installed')
 
 @when_not('openvim-controller.available')
 def need_openvim():
