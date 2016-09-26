@@ -117,7 +117,9 @@ def setup_db(db):
     status_set('maintenance', 'Initializing database')
 
     try:
-        cmd = "{}/database_utils/init_mano_db.sh --createdb ".format(kvdb.get('repo'))
+        # HACK: use a packed version of init_mano_db until bug https://osm.etsi.org/bugzilla/show_bug.cgi?id=56 is fixed
+        # cmd = "{}/database_utils/init_mano_db.sh --createdb ".format(kvdb.get('repo'))
+        cmd = "./scripts//init_mano_db.sh --createdb "
         cmd += "-u {} -p{} -h {} -d {} -P {}".format(
             db.user(),
             db.password(),
