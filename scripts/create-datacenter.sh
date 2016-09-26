@@ -13,7 +13,7 @@ export OPENMANO_DATACENTER=`echo $OPENMANO_DATACENTER |gawk '{print $1}'`
 # FIXME: don't add this to .bashrc if it already exists.
 if ! grep -q "^export OPENMANO_DATACENTER" $HOME/.bashrc
 then
-    echo "export OPENMANO_DATACENTER=$OPENMANO_DATACENTER " >> $HOME.bashrc
+    echo "export OPENMANO_DATACENTER=$OPENMANO_DATACENTER " >> $HOME/.bashrc
 fi
 
 # TODO: Test idempotency. We may need to check and remove existing data
