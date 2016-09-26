@@ -54,11 +54,12 @@ def openvim_available(openvim, db):
             if kvdb.get('openvim_uri') == openvim_uri:
                 return
 
+            import pdb; pdb.set_trace()
             # TODO: encapsulate the logic in create-datacenter.sh into python
             try:
-                out, err = _run(
-                    './scripts/create-datacenter.sh {} {} {} {}'.format(
-                        host, port, user, kvdb.get('openmano-tenant')))
+                cmd = './scripts/create-datacenter.sh {} {} {} {}'.format(
+                    host, port, user, kvdb.get('openmano-tenant'))
+                out, err = _run(cmd)
             except subprocess.CalledProcessError as e:
                 # Ignore the error if the datacenter already exists.
                 if e.returncode != 153:
