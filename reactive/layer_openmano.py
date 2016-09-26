@@ -40,7 +40,7 @@ def openmano_available(openmano):
 
 
 @when('openmano.installed')
-@when('db.available')
+@when('db.available', 'db.installed')
 @when('openvim-controller.available')
 @when('openmano.running')
 def openvim_available(openvim, db):
@@ -72,12 +72,13 @@ def openvim_available(openvim, db):
 
 
 @when('openmano.installed')
-@when('db.available')
+@when('db.available', 'db.installed')
 @when('openvim-controller.available')
 @when_not('openmano.running')
 def start(*args):
     # TODO: if the service fails to start, we should raise an error to the op
-    # Right now, it sets the state as running and the charm dies.
+    # Right now, it sets the state as running and the charm dies. Because
+    # service-openmano returns 0 when it fails.
     cmd = "/home/{}/bin/service-openmano start".format(USER)
     out, err = _run(cmd)
 
@@ -116,7 +117,7 @@ def setup_db(db):
     status_set('maintenance', 'Initializing database')
 
     try:
-        cmd = "{}/database_utils/init_mano_db.sh --createdb".format(kvdb.get('repo'))
+        cmd = "{}/database_utils/init_mano_db.sh --createdb ".format(kvdb.get('repo'))
         cmd += "-u {} -p{} -h {} -d {} -P {}".format(
             db.user(),
             db.password(),
